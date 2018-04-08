@@ -68,7 +68,26 @@ class OptionsBuilder
      * @var bool
      */
     protected $dryRun = false;
-
+    
+    /**
+     * @internal
+     * 
+     * var string|null
+     */
+    protected $proxy = null;
+    
+    /**
+     * This sets the proxy for the request if it is required.
+     * 
+     * @param string $proxy
+     * @return \LaravelFCM\Message\OptionsBuilder
+     */
+    public function setProxy($proxy) {
+        $this->proxy = $proxy;
+        
+        return $this;
+    }
+    
     /**
      * This parameter identifies a group of messages
      * A maximum of 4 different collapse keys is allowed at any given time.
@@ -199,6 +218,15 @@ class OptionsBuilder
         $this->dryRun = $isDryRun;
 
         return $this;
+    }
+    
+    /**
+     * Get's the proxy string.
+     * 
+     * @return string
+     */
+    public function getProxy() {
+        return $this->proxy;
     }
 
     /**

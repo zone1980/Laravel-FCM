@@ -8,7 +8,14 @@ use Illuminate\Contracts\Support\Arrayable;
  * Class Options.
  */
 class Options implements Arrayable
-{
+{  
+    /**
+     * @internal
+     * 
+     * @var string
+     */
+    protected $proxy = null;
+    
     /**
      * @internal
      *
@@ -72,6 +79,7 @@ class Options implements Arrayable
      */
     public function __construct(OptionsBuilder $builder)
     {
+        $this->proxy = $builder->getProxy();
         $this->collapseKey = $builder->getCollapseKey();
         $this->priority = $builder->getPriority();
         $this->contentAvailable = $builder->isContentAvailable();
@@ -104,6 +112,10 @@ class Options implements Arrayable
             'restricted_package_name' => $this->restrictedPackageName,
             'dry_run' => $dryRun,
         ];
+        
+        if(! is_null($this->proxy)) {
+            $options['proxy'] = $this->proxy;
+        }
 
         return array_filter($options);
     }
