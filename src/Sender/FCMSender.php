@@ -32,7 +32,7 @@ class FCMSender extends HTTPSender
      *
      * @return DownstreamResponse|null
      */
-    public function sendTo($to, Options $options = null, PayloadNotification $notification = null, PayloadData $data = null)
+    public function sendTo($to, Options $options = null, PayloadNotification $notification = null, PayloadData $data = null, $proxy = null)
     {
         $response = null;
 
@@ -41,7 +41,7 @@ class FCMSender extends HTTPSender
             foreach ($partialTokens as $tokens) {
                 $request = new Request($tokens, $options, $notification, $data);
 
-                $responseGuzzle = $this->post($request);
+                $responseGuzzle = $this->post($request, $proxy);
 
                 $responsePartial = new DownstreamResponse($responseGuzzle, $tokens);
                 if (!$response) {
@@ -52,7 +52,7 @@ class FCMSender extends HTTPSender
             }
         } else {
             $request = new Request($to, $options, $notification, $data);
-            $responseGuzzle = $this->post($request);
+            $responseGuzzle = $this->post($request, $proxy);
 
             $response = new DownstreamResponse($responseGuzzle, $to);
         }
@@ -105,10 +105,15 @@ class FCMSender extends HTTPSender
      *
      * @return null|\Psr\Http\Message\ResponseInterface
      */
-    private function post($request)
-    {
+    private function post($request, $proxy = null)
+    {   
+        $build_request = $request->build();
+        if(! is_null($proxy)) {
+            $build_request['proxy'] = $proxy;
+        }
+        
         try {
-            $responseGuzzle = $this->client->request('post', $this->url, $request->build());
+            $responseGuzzle = $this->client->request('post', $this->url, $build_request);
         } catch (ClientException $e) {
             $responseGuzzle = $e->getResponse();
         }
